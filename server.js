@@ -52,18 +52,42 @@ app.get('/api/todos/search', function search(req, res) {
 app.get('/api/todos', function index(req, res) {
   /* This endpoint responds with all of the todos
    */
+   res.json({data: todos});
+
 });
 
 app.post('/api/todos', function create(req, res) {
   /* This endpoint will add a todo to our "database"
    * and respond with the newly created todo.
    */
+  
+    var lastTodos = todos[todos.length - 1];
+    var nextID = lastTodos._id + 1;
+
+    var objectToAdd = {
+      _id: nextID, 
+      task: req.body.task,  
+      description: req.body.description
+    }
+
+    todos.push(objectToAdd);
+
+    res.json(objectToAdd);
+
 });
 
 app.get('/api/todos/:id', function show(req, res) {
   /* This endpoint will return a single todo with the
    * id specified in the route parameter (:id)
    */
+   var todosID = req.params.id;
+   var todoWithIdInUrl = todos.find(function(item){
+    return item._id == todosID;
+
+   });
+
+   res.json(todoWithIdInUrl);
+
 });
 
 app.put('/api/todos/:id', function update(req, res) {
@@ -71,6 +95,17 @@ app.put('/api/todos/:id', function update(req, res) {
    * id specified in the route parameter (:id) and respond
    * with the newly updated todo.
    */
+   var todosID = req.params.id;
+   var  todoIDToUpdate = todos.find(function(item){
+    if(item._id == todosID){
+      item.task = req.body.task;
+      item.description = req.body.description;
+    }
+
+   })
+
+   
+
 });
 
 app.delete('/api/todos/:id', function destroy(req, res) {
@@ -78,6 +113,17 @@ app.delete('/api/todos/:id', function destroy(req, res) {
    * id specified in the route parameter (:id) and respond
    * with success.
    */
+
+   var id = req.params.id;
+   todos = todos.filter(function(item){
+    return item._id != id; // one equal is less strict for !
+
+   })
+
+   res.json(todos);
+
+
+
 });
 
 /**********
